@@ -642,7 +642,7 @@ GameObject:
   - component: {fileID: 299899364}
   m_Layer: 8
   m_Name: Inside
-  m_TagString: Target
+  m_TagString: Shield
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
