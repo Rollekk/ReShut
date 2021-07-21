@@ -2,18 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public struct GunTarget
-{
-    public GameObject targetCube;
-    public Vector3 targetPoint;
-
-    public GunTarget(GameObject targetCube, Vector3 targetPoint)
-    {
-        this.targetCube = targetCube;
-        this.targetPoint = targetPoint;
-    }
-}
-
 public class GunController : MonoBehaviour
 {
     public enum GunType { Normal, Ice, Fire, Poison, Electricity };
@@ -22,19 +10,11 @@ public class GunController : MonoBehaviour
     [Header("Components")]
     public GameObject gunPoint;
 
-    private Camera playerCamera;
+    public Camera playerCamera;
     private Material[] gunMaterials;
     private GameObject playerBody;
     private PlayerUIController playerUI;
     private PlayerController playerController;
-
-    [Header("Target")]
-    public KeyCode targetKey;
-    public float spawnTargetDistance;
-    public int maxTargetPoints;
-    public LayerMask TargetLayer;
-    public GameObject targetPrefab;
-    public List<GunTarget> gunPointsList = new List<GunTarget>();
 
     private RaycastHit GunHit;
 
@@ -69,60 +49,25 @@ public class GunController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(targetKey)) CreateTarget();
+        //if (Input.GetKeyDown(targetKey)) CreateTarget();
         if (Input.GetKeyDown(shootKey)) Shoot();
-
-        if (gunPointsList.Count == 0 && bullet) bullet.ReturnToPlayer(gunPoint.transform.position);
 
         AddGunSway();
     }
 
-    #region - Target -
-    void CreateTarget()
-    {
-        if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out GunHit, spawnTargetDistance, TargetLayer))
-        {
-            if (gunPointsList.Count < maxTargetPoints && currentAmmunition > 0)
-            {
-                GameObject target = Instantiate(targetPrefab, GunHit.point, targetPrefab.transform.rotation);
-                target.layer = LayerMask.NameToLayer("Target");
-                gunPointsList.Add(new GunTarget(target.gameObject, GunHit.point));
-            }
-        }
-
-        for (int i = 0; i < gunPointsList.Count - 1; i++)
-        {
-            gunPointsList[i].targetCube.transform.rotation = RotateToObject(gunPointsList[i + 1].targetPoint, gunPointsList[i].targetPoint);
-        }
-
-    }
-
-    public void ClearOneTargetPoint()
-    {
-        Destroy(gunPointsList[0].targetCube);
-        gunPointsList.RemoveAt(0);
-    }
-
-    public void ClearAllTargetPoints()
-    {
-        for (int i = 0; i < gunPointsList.Count; i++)
-            Destroy(gunPointsList[i].targetCube);
-        gunPointsList.Clear();
-    }
-
-    #endregion
-
     void Shoot()
     {
-        if (gunPointsList.Count > 0 && currentAmmunition > 0)
+        if (currentAmmunition > 0)
         {
-            bullet = Instantiate(bulletPrefab, gunPoint.transform.position, RotateToObject(gunPointsList[0].targetPoint, gunPoint.transform.position)).GetComponentInChildren<Bullet>();
-            bullet.gunController = this;
-
-            bullet.bulletSpeed = Vector3.Distance(playerBody.transform.position, gunPointsList[0].targetPoint) * 6;
-            currentAmmunition--;
-            playerUI.UpdateAmmunitionText(currentAmmunition);
-            bullet.canReturn = true;
+            Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+            if(Physics.Raycast(ray, out GunHit))
+            {
+                bullet = Instantiate(bulletPrefab, gunPoint.transform.position, RotateToObject(GunHit.point, gunPoint.transform.position)).GetComponentInChildren<Bullet>();
+                bullet.gunController = this;
+                currentAmmunition--;
+                playerUI.UpdateAmmunitionText(currentAmmunition);
+                bullet.canReturn = true;
+            }
         }
     }
 
@@ -159,4 +104,5 @@ public class GunController : MonoBehaviour
 
         return Quaternion.LookRotation(targetDirection);
     }
+
 }

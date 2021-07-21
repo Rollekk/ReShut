@@ -1,27 +1,37 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
 public class Bullet : MonoBehaviour
 {
-    public float bulletSpeed = 2f;
-    public float bulletCheckDistance = 2f;
-    public float trailTime = 2f;
-
+    [Header("Components")]
     public GunController gunController;
     public TrailController trailController;
 
     private TrailRenderer trailRenderer;
+    private Camera playerCamera;
+
     private RaycastHit bulletHit;
+
+    [Header("Bullet")]
+    public float bulletSpeed = 2f;
+    public float bulletCheckDistance = 2f;
+    public float trailTime = 2f;
 
     public float bulletCooldown = 2.0f;
     private bool bMissed = false;
     public bool canReturn = true;
 
+    private int reboundCounter = 0;
+    public int maxRebounds;
+
     // Start is called before the first frame update
     void Start()
     {
         trailRenderer = GetComponentInChildren<TrailRenderer>();
+
+        playerCamera = gunController.playerCamera;
 
         trailRenderer.emitting = false;
         trailRenderer.time = trailTime;
@@ -33,6 +43,7 @@ public class Bullet : MonoBehaviour
         if (!bMissed) CheckBulletFrontCollision();
         else ReturnAmmunition();
 
+        if (reboundCounter >= maxRebounds) ReturnToPlayer(gunController.gunPoint.transform.position);
     }
 
     public void ReturnToPlayer(Vector3 playerPosition)
@@ -40,19 +51,19 @@ public class Bullet : MonoBehaviour
         gameObject.transform.rotation = gunController.RotateToObject(playerPosition, transform.position);
         Destroy(trailController.GetTrailCollider());
         trailRenderer.emitting = false;
-        bulletSpeed = 50;
+        bulletSpeed = 25f;
     }
 
     public void Rebound()
     {
-        transform.position = gunController.gunPointsList[0].targetPoint;
-        transform.rotation = gunController.gunPointsList[0].targetCube.transform.rotation;
-
         trailController.AddTrailToBullet(transform);
 
-        if (gunController.gunPointsList.Count != 1) bulletSpeed = Vector3.Distance(gunController.gunPointsList[0].targetPoint, gunController.gunPointsList[1].targetPoint) * 6;
- 
-        gunController.ClearOneTargetPoint();
+        if(reboundCounter == 0) transform.forward = Vector3.Reflect(playerCamera.transform.forward, bulletHit.normal);
+        else transform.forward = Vector3.Reflect(transform.forward, bulletHit.normal);
+
+        transform.position = bulletHit.point;
+
+        reboundCounter++;
         trailRenderer.emitting = true;
     }
 
@@ -73,13 +84,13 @@ public class Bullet : MonoBehaviour
         transform.position += transform.forward * bulletSpeed * Time.deltaTime;
         trailController.AddTrailToBullet(transform);
 
-
         if (Physics.Raycast(transform.position, transform.forward, out bulletHit, bulletCheckDistance))
         {
-            if (bulletHit.transform.tag == "Target")
+            if (bulletHit.transform.tag == "Shield")
             {
-                Rebound();
-                trailController.CreateNewTrail(transform);
+                bMissed = true;
+                Destroy(trailController.GetTrailCollider());
+                transform.gameObject.GetComponentInChildren<MeshRenderer>().enabled = false;
             }
             else if (bulletHit.transform.tag == "Player")
             {
@@ -88,10 +99,8 @@ public class Bullet : MonoBehaviour
             }
             else
             {
-                bMissed = true;
-                gunController.ClearAllTargetPoints();
-                Destroy(trailController.GetTrailCollider());
-                transform.gameObject.GetComponentInChildren<MeshRenderer>().enabled = false;
+                Rebound();
+                trailController.CreateNewTrail(transform);
             }
         }
     }
