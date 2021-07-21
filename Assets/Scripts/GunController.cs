@@ -30,34 +30,35 @@ public class GunController : MonoBehaviour
 
     [Header("Target")]
     public KeyCode targetKey;
-    public float putTargetRange;
+    public float spawnTargetDistance;
     public int maxTargetPoints;
     public LayerMask TargetLayer;
     public GameObject targetPrefab;
-
     public List<GunTarget> gunPointsList = new List<GunTarget>();
 
     private RaycastHit GunHit;
 
+    [Header("Bullet")]
+    private Bullet bullet;
+
     [Header("Shoot")]
     public KeyCode shootKey;
+    public int currentAmmunition = 1;
     public GameObject bulletPrefab;
 
-    private GameObject bulletObject;
-    private Bullet bulletScript;
-
-    [Header("Bullet")]
-    public int currentAmmunition= 1;
-
-    private float bulletCD = 2.0f;
-    private bool bShouldBulletTimerTick = false;
-    private bool bReturnBullet = true;
+    [Header("Sway")]
+    private Vector3 initialGunPosition;
+    private float swayAmount = 0.1f;
+    private float maxSwayAmount = 0.3f;
+    private float smoothSwayAmount = 5.0f;
 
     // Start is called before the first frame update
     void Start()
     {
         gunMaterials = GetComponentInChildren<MeshRenderer>().materials;
         playerController = transform.root.GetComponentInChildren<PlayerController>();
+
+        initialGunPosition = transform.localPosition;
 
         playerCamera = playerController.playerCamera;
         playerBody = playerController.transform.gameObject;
@@ -71,19 +72,17 @@ public class GunController : MonoBehaviour
         if (Input.GetKeyDown(targetKey)) CreateTarget();
         if (Input.GetKeyDown(shootKey)) Shoot();
 
-        if (gunPointsList.Count == 0 && bulletScript)
-        {
-            bulletScript.ReturnToPlayer(gunPoint.transform.position);
-        }
+        if (gunPointsList.Count == 0 && bullet) bullet.ReturnToPlayer(gunPoint.transform.position);
 
-        if (bShouldBulletTimerTick) ReturnBulletAfterTime();
+        AddGunSway();
     }
 
+    #region - Target -
     void CreateTarget()
     {
-        if(Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out GunHit, putTargetRange, TargetLayer))
+        if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out GunHit, spawnTargetDistance, TargetLayer))
         {
-            if (gunPointsList.Count < maxTargetPoints)
+            if (gunPointsList.Count < maxTargetPoints && currentAmmunition > 0)
             {
                 GameObject target = Instantiate(targetPrefab, GunHit.point, targetPrefab.transform.rotation);
                 target.layer = LayerMask.NameToLayer("Target");
@@ -93,25 +92,9 @@ public class GunController : MonoBehaviour
 
         for (int i = 0; i < gunPointsList.Count - 1; i++)
         {
-          gunPointsList[i].targetCube.transform.rotation = RotateToObject(gunPointsList[i + 1].targetPoint, gunPointsList[i].targetPoint);
+            gunPointsList[i].targetCube.transform.rotation = RotateToObject(gunPointsList[i + 1].targetPoint, gunPointsList[i].targetPoint);
         }
 
-    }
-
-    void Shoot()
-    {
-        if (gunPointsList.Count > 0 && currentAmmunition > 0)
-        {
-            bulletObject = Instantiate(bulletPrefab, gunPoint.transform.position, RotateToObject(gunPointsList[0].targetPoint, gunPoint.transform.position));
-
-            bulletScript = bulletObject.GetComponentInChildren<Bullet>();
-            bulletScript.gunController = this;
-
-            bulletScript.bulletSpeed = Vector3.Distance(playerBody.transform.position, gunPointsList[0].targetPoint) * 6;
-            currentAmmunition--;
-            playerUI.UpdateAmmunitionText(currentAmmunition);
-            bReturnBullet = true;
-        }
     }
 
     public void ClearOneTargetPoint()
@@ -122,33 +105,52 @@ public class GunController : MonoBehaviour
 
     public void ClearAllTargetPoints()
     {
-        for(int i = 0; i < gunPointsList.Count; i++)
-        Destroy(gunPointsList[i].targetCube);
+        for (int i = 0; i < gunPointsList.Count; i++)
+            Destroy(gunPointsList[i].targetCube);
         gunPointsList.Clear();
     }
 
-    public void UpdateAmmunitionUI()
+    #endregion
+
+    void Shoot()
     {
-        if(bReturnBullet)
+        if (gunPointsList.Count > 0 && currentAmmunition > 0)
         {
-            currentAmmunition++;
+            bullet = Instantiate(bulletPrefab, gunPoint.transform.position, RotateToObject(gunPointsList[0].targetPoint, gunPoint.transform.position)).GetComponentInChildren<Bullet>();
+            bullet.gunController = this;
+
+            bullet.bulletSpeed = Vector3.Distance(playerBody.transform.position, gunPointsList[0].targetPoint) * 6;
+            currentAmmunition--;
             playerUI.UpdateAmmunitionText(currentAmmunition);
-            bReturnBullet = false;
+            bullet.canReturn = true;
         }
     }
 
-    public void ReturnBulletAfterTime()
+    private void AddGunSway()
     {
-        if(bulletCD > 0.0f)
+        float mouseX = Input.GetAxis("Mouse X") * swayAmount;
+        float mouseY = Input.GetAxis("Mouse Y") * swayAmount;
+
+        mouseX = Mathf.Clamp(mouseX, -maxSwayAmount, maxSwayAmount);
+        mouseY = Mathf.Clamp(mouseY, -maxSwayAmount, maxSwayAmount);
+
+        Vector3 finalPosToMove = new Vector3(mouseX, mouseY, 0);
+        transform.localPosition = Vector3.Lerp(transform.localPosition, finalPosToMove + initialGunPosition, Time.deltaTime * smoothSwayAmount);
+    }
+
+    public void AddAmmunition()
+    {
+        if (bullet.canReturn)
         {
-            bulletCD = bulletCD - Time.deltaTime;
+            currentAmmunition++;
+            playerUI.UpdateAmmunitionText(currentAmmunition);
         }
-        else
-        {
-            UpdateAmmunitionUI();
-            bShouldBulletTimerTick = false;
-            bulletCD = 2.0f;
-        }
+    }
+
+    public void ChangeGunType(GunType toThis, Color newColor)
+    {
+        gunType = toThis;
+        gunMaterials[1].SetColor("_EmissionColor", newColor);
     }
 
     public Quaternion RotateToObject(Vector3 target, Vector3 start)
@@ -156,16 +158,5 @@ public class GunController : MonoBehaviour
         Vector3 targetDirection = target - start;
 
         return Quaternion.LookRotation(targetDirection);
-    }
-
-    public void StartBulletCD(bool bShouldStart)
-    {
-        bShouldBulletTimerTick = bShouldStart;
-    }
-
-    public void ChangeWeaponType(GunType toThis, Color newColor)
-    {
-        gunType = toThis;
-        gunMaterials[1].SetColor("_EmissionColor", newColor);
     }
 }

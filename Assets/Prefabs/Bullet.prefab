@@ -219,7 +219,7 @@ SphereCollider:
   m_GameObject: {fileID: 7270715833813415227}
   m_Material: {fileID: 0}
   m_IsTrigger: 1
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -236,8 +236,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bulletSpeed: 2
-  bulletCast: 0.5
+  bulletCheckDistance: 0.5
   trailTime: 2
   gunController: {fileID: 0}
   trailController: {fileID: 1213170331226249830, guid: b924d733e9cce4d418d8941f91e5c787,
     type: 3}
+  bulletCooldown: 2
+  canReturn: 1

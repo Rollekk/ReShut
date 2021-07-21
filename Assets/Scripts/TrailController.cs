@@ -38,7 +38,7 @@ public class TrailController : MonoBehaviour
         }
     }
 
-    public GameObject GetCylinder() { return trailCollider; }
+    public GameObject GetTrailCollider() { return trailCollider; }
 
     private void OnTriggerEnter(Collider other)
     {

@@ -5,7 +5,7 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
     public float bulletSpeed = 2f;
-    public float bulletCast = 2f;
+    public float bulletCheckDistance = 2f;
     public float trailTime = 2f;
 
     public GunController gunController;
@@ -14,11 +14,15 @@ public class Bullet : MonoBehaviour
     private TrailRenderer trailRenderer;
     private RaycastHit bulletHit;
 
+    public float bulletCooldown = 2.0f;
+    private bool bMissed = false;
+    public bool canReturn = true;
 
     // Start is called before the first frame update
     void Start()
     {
         trailRenderer = GetComponentInChildren<TrailRenderer>();
+
         trailRenderer.emitting = false;
         trailRenderer.time = trailTime;
     }
@@ -26,35 +30,15 @@ public class Bullet : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.position += transform.forward * bulletSpeed * Time.deltaTime;
-        trailController.AddTrailToBullet(transform);
+        if (!bMissed) CheckBulletFrontCollision();
+        else ReturnAmmunition();
 
-        if (Physics.Raycast(transform.position, transform.forward, out bulletHit, bulletCast))
-        {
-            if (bulletHit.transform.tag == "Target")
-            {
-                Rebound();
-                trailController.CreateNewTrail(transform);
-            }
-            else if (bulletHit.transform.tag == "Player")
-            {
-                gunController.UpdateAmmunitionUI();
-                Destroy(gameObject);
-            }
-            else
-            {
-                gunController.StartBulletCD(true);
-                gunController.ClearAllTargetPoints();
-                Destroy(trailController.GetCylinder());
-                Destroy(this.gameObject);
-            }
-        }
     }
 
     public void ReturnToPlayer(Vector3 playerPosition)
     {
         gameObject.transform.rotation = gunController.RotateToObject(playerPosition, transform.position);
-        Destroy(trailController.GetCylinder());
+        Destroy(trailController.GetTrailCollider());
         trailRenderer.emitting = false;
         bulletSpeed = 50;
     }
@@ -72,15 +56,51 @@ public class Bullet : MonoBehaviour
         trailRenderer.emitting = true;
     }
 
+    public void ReturnAmmunition()
+    {
+        if (bulletCooldown > 0.0f)
+        {
+            bulletCooldown = bulletCooldown - Time.deltaTime;
+        }
+        else
+        {
+            Destroy(this.gameObject);
+        }
+    }
+
+    private void CheckBulletFrontCollision()
+    {
+        transform.position += transform.forward * bulletSpeed * Time.deltaTime;
+        trailController.AddTrailToBullet(transform);
+
+
+        if (Physics.Raycast(transform.position, transform.forward, out bulletHit, bulletCheckDistance))
+        {
+            if (bulletHit.transform.tag == "Target")
+            {
+                Rebound();
+                trailController.CreateNewTrail(transform);
+            }
+            else if (bulletHit.transform.tag == "Player")
+            {
+                gunController.AddAmmunition();
+                Destroy(gameObject);
+            }
+            else
+            {
+                bMissed = true;
+                gunController.ClearAllTargetPoints();
+                Destroy(trailController.GetTrailCollider());
+                transform.gameObject.GetComponentInChildren<MeshRenderer>().enabled = false;
+            }
+        }
+    }
+
     private void OnDestroy()
     {
         trailRenderer.transform.parent = null;
         trailRenderer.autodestruct = true;
-    }
 
-    //private void OnDrawGizmos()
-    //{
-    //        Gizmos.color = Color.red;
-    //        Gizmos.DrawWireSphere(transform.position, 0.05f);
-    //}
+        if(bMissed) gunController.AddAmmunition();
+    }
 }

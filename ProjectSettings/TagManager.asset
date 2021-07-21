@@ -7,7 +7,7 @@ TagManager:
   - Target
   - PlayerTag
   - Ground
-  - Revolver
+  - Gun
   layers:
   - Default
   - TransparentFX

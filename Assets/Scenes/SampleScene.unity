@@ -803,7 +803,7 @@ GameObject:
   - component: {fileID: 352424938}
   m_Layer: 10
   m_Name: GunPoint
-  m_TagString: Player
+  m_TagString: Gun
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -816,7 +816,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 352424937}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.00722, y: -0.00553, z: 0.00001}
+  m_LocalPosition: {x: 0.008553, y: 0.002349, z: 0.000016}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 543450653009101243}
@@ -1619,7 +1619,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0.663, z: 0.344}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 543450653009101243}
+  - {fileID: 1505703556}
   m_Father: {fileID: 713689819}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1697,6 +1697,37 @@ MonoBehaviour:
   m_BeforeTransparentBundles: []
   m_BeforeStackBundles: []
   m_AfterStackBundles: []
+--- !u!1 &1505703555
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1505703556}
+  m_Layer: 0
+  m_Name: GunHolder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1505703556
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1505703555}
+  m_LocalRotation: {x: -0, y: -0.04971656, z: -0, w: 0.99876344}
+  m_LocalPosition: {x: 0.605, y: -0.496, z: 0.642}
+  m_LocalScale: {x: 0.86757, y: 0.86757, z: 0.86757}
+  m_Children:
+  - {fileID: 543450653009101243}
+  m_Father: {fileID: 963194228}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: -5.6990004, z: 0}
 --- !u!1 &1720474439
 GameObject:
   m_ObjectHideFlags: 0
@@ -2121,11 +2152,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 919132148806425345}
   m_LocalRotation: {x: -0.020993803, y: -0.645723, z: 0.030106243, w: 0.7626892}
-  m_LocalPosition: {x: 0.62, y: 0.32, z: 0.659}
-  m_LocalScale: {x: 100, y: 100, z: 100}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 100.000015, y: 100, z: 100}
   m_Children:
   - {fileID: 352424938}
-  m_Father: {fileID: 963194228}
+  m_Father: {fileID: 1505703556}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0.393, y: -80.491005, z: 4.188}
 --- !u!1 &919132148806425345
@@ -2143,7 +2174,7 @@ GameObject:
   - component: {fileID: 919132148806425347}
   m_Layer: 10
   m_Name: Revolver
-  m_TagString: Respawn
+  m_TagString: Gun
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2162,7 +2193,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gunPoint: {fileID: 352424937}
   targetKey: 324
-  putTargetRange: 10
+  spawnTargetDistance: 10
   maxTargetPoints: 5
   TargetLayer:
     serializedVersion: 2
@@ -2170,9 +2201,9 @@ MonoBehaviour:
   targetPrefab: {fileID: 3034319468440077075, guid: 2f49a98ed91bd094d80a2d4ecd25458a,
     type: 3}
   shootKey: 323
+  currentAmmunition: 1
   bulletPrefab: {fileID: 7270715833813415227, guid: 39fb7fe1fa190d7469ae640d323585f3,
     type: 3}
-  currentAmmunition: 1
 --- !u!65 &919132148806425347
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2184,8 +2215,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.010917106, y: 0.00512222, z: 0.0012529115}
-  m_Center: {x: 0.0029435547, y: -0.0067586834, z: -0.00000019325363}
+  m_Size: {x: 0.01126837, y: 0.0049636653, z: 0.0012529115}
+  m_Center: {x: 0.004144724, y: 0.00071632134, z: -0.0000014048924}
 --- !u!23 &1711813856286751444
 MeshRenderer:
   m_ObjectHideFlags: 0

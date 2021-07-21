@@ -49,7 +49,7 @@ public class PickupBuff : MonoBehaviour
     {
         if (other.tag == "Player")
         {
-            gunController = other.transform.Find("PlayerCamera/Revolver").GetComponentInChildren<GunController>();
+            gunController = other.transform.Find("PlayerCamera/GunHolder/").GetComponentInChildren<GunController>();
             BuffPlayerWeapon();
         }
     }
@@ -61,7 +61,7 @@ public class PickupBuff : MonoBehaviour
 
     private void BuffPlayerWeapon()
     {
-        gunController.ChangeWeaponType(buffType, buffColor);
+        gunController.ChangeGunType(buffType, buffColor);
 
         trailMaterial.SetColor("_EmissionColor", buffColor);
     }
