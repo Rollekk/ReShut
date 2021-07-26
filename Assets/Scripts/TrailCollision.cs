@@ -2,15 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TrailController : MonoBehaviour
+public class TrailCollision : MonoBehaviour
 {
     public GameObject colliderPrefab;
+    public BulletController bulletToFollow;
+
     private GameObject trailCollider;
     private Vector3 startPosition;
 
     // Start is called before the first frame update
     void Start()
     {
+        
     }
 
     // Update is called once per frame
@@ -19,21 +22,22 @@ public class TrailController : MonoBehaviour
         
     }
 
-    public void CreateNewTrail(Transform bulletTransform)
+    public void CreateNewTrail(BulletController bulletToFollow)
     {
-        trailCollider = Instantiate(colliderPrefab, bulletTransform.position, bulletTransform.rotation);
+        this.bulletToFollow = bulletToFollow;
+        trailCollider = Instantiate(colliderPrefab, this.bulletToFollow.transform.position, this.bulletToFollow.transform.rotation);
         startPosition = trailCollider.transform.position;
-        trailCollider.transform.localScale = bulletTransform.localScale;
-        trailCollider.transform.up = -bulletTransform.forward;
+        trailCollider.transform.localScale = this.bulletToFollow.transform.localScale;
+        trailCollider.transform.up = -this.bulletToFollow.transform.forward;
 
         Destroy(trailCollider, 2f);
     }
 
-    public void AddTrailToBullet(Transform bulletTransform)
+    public void AddTrailToBullet(BulletController bulletToFollow)
     {
         if (trailCollider)
         {
-            trailCollider.transform.position = bulletTransform.position;
+            trailCollider.transform.position = bulletToFollow.transform.position;
             trailCollider.transform.localScale = new Vector3(trailCollider.transform.localScale.x, Vector3.Distance(trailCollider.transform.position, startPosition) / 2, trailCollider.transform.localScale.z);
         }
     }

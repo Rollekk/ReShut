@@ -8,6 +8,8 @@ TagManager:
   - Ground
   - Gun
   - Shield
+  - Trail
+  - Bullet
   layers:
   - Default
   - TransparentFX

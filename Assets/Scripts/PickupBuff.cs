@@ -8,7 +8,6 @@ public class PickupBuff : MonoBehaviour
     public float floatSpeed = 0.1f;
     public float floatRange = 1f;
 
-    public Material trailMaterial;
     public GunController.GunType buffType;
     private Material buffMaterial;
     private Color buffColor;
@@ -62,7 +61,5 @@ public class PickupBuff : MonoBehaviour
     private void BuffPlayerWeapon()
     {
         gunController.ChangeGunType(buffType, buffColor);
-
-        trailMaterial.SetColor("_EmissionColor", buffColor);
     }
 }

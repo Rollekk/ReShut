@@ -9,17 +9,15 @@ public class GunController : MonoBehaviour
 
     [Header("Components")]
     public GameObject gunPoint;
-
     public Camera playerCamera;
+
+    private BulletController bullet;
     private Material[] gunMaterials;
     private GameObject playerBody;
     private PlayerUIController playerUI;
     private PlayerController playerController;
 
     private RaycastHit GunHit;
-
-    [Header("Bullet")]
-    private Bullet bullet;
 
     [Header("Shoot")]
     public KeyCode shootKey;
@@ -49,7 +47,6 @@ public class GunController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //if (Input.GetKeyDown(targetKey)) CreateTarget();
         if (Input.GetKeyDown(shootKey)) Shoot();
 
         AddGunSway();
@@ -62,8 +59,10 @@ public class GunController : MonoBehaviour
             Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             if(Physics.Raycast(ray, out GunHit))
             {
-                bullet = Instantiate(bulletPrefab, gunPoint.transform.position, RotateToObject(GunHit.point, gunPoint.transform.position)).GetComponentInChildren<Bullet>();
+                bullet = Instantiate(bulletPrefab, gunPoint.transform.position, RotateToObject(GunHit.point, gunPoint.transform.position)).GetComponentInChildren<BulletController>();
                 bullet.gunController = this;
+                bullet.trailColor = gunMaterials[1].GetColor("_EmissionColor");
+
                 currentAmmunition--;
                 playerUI.UpdateAmmunitionText(currentAmmunition);
                 bullet.canReturn = true;
