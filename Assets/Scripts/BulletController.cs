@@ -10,14 +10,15 @@ public class BulletController : MonoBehaviour
 
     private Camera playerCamera;
     private RaycastHit bulletHit;
+    public ParticleSystem reboundParticles;
 
     [Header("Bullet")]
     public float bulletSpeed = 2f;
-    public float bulletCheckDistance = 2f;
     public float bulletCooldown = 2.0f;
     public bool canReturn = true;
 
     private bool bMissed = false;
+    private Vector3 previousPosition;
 
     [Header("Trail")]
     public TrailCollision trailCollision;
@@ -27,8 +28,9 @@ public class BulletController : MonoBehaviour
     private TrailRenderer trailRenderer;
 
     [Header("Rebound")]
-    private int reboundCounter = 0;
     public int maxRebounds;
+
+    private int reboundCounter = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -40,6 +42,8 @@ public class BulletController : MonoBehaviour
 
         trailRenderer.emitting = false;
         trailRenderer.time = trailTime;
+
+        previousPosition = transform.position;
     }
 
     // Update is called once per frame
@@ -70,6 +74,10 @@ public class BulletController : MonoBehaviour
 
         reboundCounter++;
         trailRenderer.emitting = true;
+
+        ParticleSystem ps = Instantiate(reboundParticles, bulletHit.point, Quaternion.LookRotation(bulletHit.normal));
+        ps.GetComponent<ParticleSystemRenderer>().material.SetColor("_EmissionColor", trailColor);
+        ps.Play();
     }
 
     public void ReturnAmmunition()
@@ -86,10 +94,12 @@ public class BulletController : MonoBehaviour
 
     private void CheckBulletFrontCollision()
     {
+        previousPosition = transform.position;
+
         transform.position += transform.forward * bulletSpeed * Time.deltaTime;
         trailCollision.AddTrailToBullet(this);
 
-        if (Physics.Raycast(transform.position, transform.forward, out bulletHit, bulletCheckDistance))
+        if (Physics.Raycast(previousPosition, (transform.position - previousPosition).normalized, out bulletHit, (transform.position - previousPosition).magnitude))
         {
             if (bulletHit.transform.tag == "Shield")
             {
@@ -102,7 +112,7 @@ public class BulletController : MonoBehaviour
                 gunController.AddAmmunition();
                 Destroy(gameObject);
             }
-            else if(bulletHit.transform.tag != "Target")
+            else if(bulletHit.transform.tag != "Target" && bulletHit.transform.tag != "Enemy")
             {
                 Rebound();
                 trailCollision.CreateNewTrail(this);

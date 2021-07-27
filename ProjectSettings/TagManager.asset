@@ -10,6 +10,7 @@ TagManager:
   - Shield
   - Trail
   - Bullet
+  - Enemy
   layers:
   - Default
   - TransparentFX
@@ -23,8 +24,8 @@ TagManager:
   - Target
   - Glow
   - Bullet
-  - 
-  - 
+  - Enemy
+  - Shield
   - 
   - 
   - 
