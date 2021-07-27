@@ -8,7 +8,7 @@ public class PickupBuff : MonoBehaviour
     public float floatSpeed = 0.1f;
     public float floatRange = 1f;
 
-    public GunController.GunType buffType;
+    public GunType buffType;
     private Material buffMaterial;
     private Color buffColor;
 

@@ -9,6 +9,11 @@ public class ColorAbsorber : MonoBehaviour
     private TrailCollision trail;
     private MeshRenderer mesh;
 
+    [Header("Color")]
+    public bool isSpecific = false;
+    public GunType neededGunType;
+
+    public bool isActive = false;
     private Color initialMaterialColor;
 
     // Start is called before the first frame update
@@ -27,17 +32,36 @@ public class ColorAbsorber : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+
         if (other.tag == "Trail")
         {
             trail = other.GetComponentInChildren<TrailCollision>();
             bullet = trail.bulletToFollow;
-            mesh.material.SetColor("_EmissionColor", bullet.trailColor);
-            Invoke("ResetMaterial", bullet.trailTime + 0.1f);
+
+            if (isSpecific)
+            {
+                if (bullet.gunController.GetCurrentGunType() == neededGunType)
+                {
+                    ActivateAbsorber();
+                }
+            }
+            else
+            {
+                ActivateAbsorber();
+            }
         }
     }
 
     private void ResetMaterial()
     {
         mesh.material.SetColor("_EmissionColor", initialMaterialColor);
+        isActive = false;
+    }
+
+    private void ActivateAbsorber()
+    {
+        mesh.material.SetColor("_EmissionColor", bullet.trailColor);
+        isActive = true;
+        Invoke("ResetMaterial", bullet.trailTime + 0.1f);
     }
 }

@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum GunType { Normal, Ice, Fire, Poison, Electricity };
+
 public class GunController : MonoBehaviour
 {
-    public enum GunType { Normal, Ice, Fire, Poison, Electricity };
     private GunType gunType = GunType.Normal;
 
     [Header("Components")]
@@ -104,4 +105,5 @@ public class GunController : MonoBehaviour
         return Quaternion.LookRotation(targetDirection);
     }
 
+    public GunType GetCurrentGunType() { return gunType; }
 }
