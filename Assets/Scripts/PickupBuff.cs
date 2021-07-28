@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PickupBuff : MonoBehaviour
+public class PickupBuff : PickupController
 {
     public float rotationSpeed;
     public float floatSpeed = 0.1f;
@@ -14,8 +14,6 @@ public class PickupBuff : MonoBehaviour
 
     private float t = 0.0f;
     private float maxLerp, minLerp;
-
-    private GunController gunController;
 
     // Start is called before the first frame update
     void Start()
@@ -44,22 +42,14 @@ public class PickupBuff : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void BuffPlayerWeapon(GunController gunController)
     {
-        if (other.tag == "Player")
-        {
-            gunController = other.transform.Find("PlayerCamera/GunHolder/").GetComponentInChildren<GunController>();
-            BuffPlayerWeapon();
-        }
+        gunController.currentGun.ChangeGunType(buffType, buffColor);
     }
 
-    private void OnTriggerExit(Collider other)
+    public override void PickupInteraction(PlayerController playerController)
     {
-        
-    }
-
-    private void BuffPlayerWeapon()
-    {
-        gunController.ChangeGunType(buffType, buffColor);
+        Debug.Log("Buff");
+        BuffPlayerWeapon(playerController.gunController);
     }
 }

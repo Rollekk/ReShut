@@ -52,12 +52,12 @@ public class BulletController : MonoBehaviour
         if (!bMissed) CheckBulletFrontCollision();
         else ReturnAmmunition();
 
-        if (reboundCounter >= maxRebounds) ReturnToPlayer(gunController.gunPoint.transform.position);
+        if (reboundCounter >= maxRebounds) ReturnToPlayer(gunController.currentGun.gunPoint.transform.position);
     }
 
     public void ReturnToPlayer(Vector3 playerPosition)
     {
-        gameObject.transform.rotation = gunController.RotateToObject(playerPosition, transform.position);
+        gameObject.transform.rotation = gunController.currentGun.RotateToObject(playerPosition, transform.position);
         Destroy(trailCollision.GetTrailCollider());
         trailRenderer.emitting = false;
         bulletSpeed = 25f;

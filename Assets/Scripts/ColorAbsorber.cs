@@ -40,7 +40,7 @@ public class ColorAbsorber : MonoBehaviour
 
             if (isSpecific)
             {
-                if (bullet.gunController.GetCurrentGunType() == neededGunType)
+                if (bullet.gunController.currentGun.GetCurrentGunType() == neededGunType)
                 {
                     ActivateAbsorber();
                 }

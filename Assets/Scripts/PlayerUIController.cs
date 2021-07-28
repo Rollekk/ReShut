@@ -7,11 +7,13 @@ public class PlayerUIController : MonoBehaviour
 {
     [Header("Components")]
     private TMP_Text ammunitionTMP;
+    public Gun currentGun;
 
     // Start is called before the first frame update
     void Start()
     {
         ammunitionTMP = transform.Find("AmmunitionTMP").GetComponentInChildren<TMP_Text>();
+        UpdateAmmunitionText();
     }
 
     // Update is called once per frame
@@ -20,8 +22,8 @@ public class PlayerUIController : MonoBehaviour
         
     }
 
-    public void UpdateAmmunitionText(int currentAmmunition)
+    public void UpdateAmmunitionText()
     {
-        ammunitionTMP.text = currentAmmunition.ToString() + "/1";
+        ammunitionTMP.text = currentGun.currentAmmunition.ToString() + "/" + currentGun.maxAmmunition.ToString();
     }
 }

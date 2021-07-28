@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 7928340453410486775}
   - component: {fileID: 8674781473650242186}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: TrailRenderer
-  m_TagString: Untagged
+  m_TagString: Bullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -140,7 +140,7 @@ GameObject:
   - component: {fileID: 6153143586308801671}
   - component: {fileID: 797434266054961307}
   - component: {fileID: -6643967690469170146}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Bullet
   m_TagString: Bullet
   m_Icon: {fileID: 0}
