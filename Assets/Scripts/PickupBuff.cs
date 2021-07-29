@@ -4,16 +4,19 @@ using UnityEngine;
 
 public class PickupBuff : PickupController
 {
+    [Header("Float")]
     public float rotationSpeed;
     public float floatSpeed = 0.1f;
     public float floatRange = 1f;
 
-    public GunType buffType;
-    private Material buffMaterial;
-    private Color buffColor;
-
     private float t = 0.0f;
     private float maxLerp, minLerp;
+
+    [Header("Components")]
+    public GunType buffType;
+
+    private Material buffMaterial;
+    private Color buffColor;
 
     // Start is called before the first frame update
     void Start()
@@ -49,7 +52,6 @@ public class PickupBuff : PickupController
 
     public override void PickupInteraction(PlayerController playerController)
     {
-        Debug.Log("Buff");
-        BuffPlayerWeapon(playerController.gunController);
+        if(playerController.gunController.currentGun) BuffPlayerWeapon(playerController.gunController);
     }
 }

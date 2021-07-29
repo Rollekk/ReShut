@@ -36,12 +36,19 @@ public class PlayerController : MonoBehaviour
         Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         if (Physics.Raycast(ray, out cursorHit, pickupDistance, pickupMask))
         {
-            if(cursorHit.transform.tag == "Pickup")
+            if (cursorHit.transform.tag == "Pickup")
             {
-                PickupController pb = cursorHit.transform.GetComponentInChildren<PickupController>();
-                pb.PickupInteraction(this);
+                playerUI.ShowPickupText(true);
+                playerUI.UpdatePickupText(pickupKey, cursorHit.transform.name);
+
+                if (Input.GetKeyDown(pickupKey))
+                {
+                    PickupController pb = cursorHit.transform.GetComponentInChildren<PickupController>();
+                    pb.PickupInteraction(this);
+                }
             }
         }
+        else playerUI.ShowPickupText(false);
     }
 }
 

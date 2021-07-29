@@ -33,11 +33,11 @@ public class TrailCollision : MonoBehaviour
         Destroy(trailCollider, 2f);
     }
 
-    public void AddTrailToBullet(BulletController bulletToFollow)
+    public void UpdateTrail(Vector3 bulletPosition)
     {
         if (trailCollider)
         {
-            trailCollider.transform.position = bulletToFollow.transform.position;
+            trailCollider.transform.position = bulletPosition;
             trailCollider.transform.localScale = new Vector3(trailCollider.transform.localScale.x, Vector3.Distance(trailCollider.transform.position, startPosition) / 2, trailCollider.transform.localScale.z);
         }
     }

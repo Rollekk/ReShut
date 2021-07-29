@@ -18,14 +18,17 @@ public class Gun : PickupController
     [Header("Shoot")]
     public int currentAmmunition = 1;
     public int maxAmmunition = 1;
+    public float bulletTrailtime = 2f;
     public GameObject bulletPrefab;
+
+    private Vector3 initialPosition;
 
     // Start is called before the first frame update
     void Start()
     {
         gunMaterials = GetComponentInChildren<MeshRenderer>().materials;
 
-        gunController = GetComponentInParent<GunController>();
+        initialPosition = transform.position;
     }
 
     // Update is called once per frame
@@ -41,6 +44,7 @@ public class Gun : PickupController
             bullet = Instantiate(bulletPrefab, gunPoint.transform.position, RotateToObject(GunHit.point, gunPoint.transform.position)).GetComponentInChildren<BulletController>();
             bullet.gunController = gunController;
             bullet.trailColor = gunMaterials[1].GetColor("_EmissionColor");
+            bullet.trailTime = bulletTrailtime;
 
             currentAmmunition--;
             bullet.canReturn = true;
@@ -68,8 +72,15 @@ public class Gun : PickupController
 
     public override void PickupInteraction(PlayerController playerController)
     {
-        //playerController.playerUI.currentGun = this;
-        //gunController.currentGun = this;
-        Debug.Log("Gun");
+        gunController = playerController.gunController;
+
+        playerController.playerUI.ShowAmmunitionText(true);
+        playerController.playerUI.UpdateAmmunitionText(currentAmmunition, maxAmmunition);
+
+        gunController.currentGun = this;
+
+        transform.position = gunController.transform.position;
+        transform.rotation = gunController.transform.rotation;
+        transform.parent = gunController.transform;
     }
 }

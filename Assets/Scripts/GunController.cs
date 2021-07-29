@@ -4,40 +4,45 @@ using UnityEngine;
 
 public class GunController : MonoBehaviour
 {
+    [Header("Components")]
     public Camera playerCamera;
+
     private PlayerController playerController;
 
     [Header("Sway")]
-    private Vector3 initialGunPosition;
+    private Vector3 initialHolderPosition;
     private float swayAmount = 0.1f;
     private float maxSwayAmount = 0.3f;
     private float smoothSwayAmount = 5.0f;
 
-    [SerializeField] private KeyCode shootKey;
-
+    [Header("Gun")]
     public Gun currentGun;
+
     private RaycastHit GunHit;
     private BulletController bullet;
+    [SerializeField] private KeyCode shootKey;
 
     // Start is called before the first frame update
     void Start()
     {
         playerController = transform.root.GetComponentInChildren<PlayerController>();
-        currentGun = GetComponentInChildren<Gun>();
 
         playerCamera = playerController.playerCamera;
 
-        initialGunPosition = transform.localPosition;
+        initialHolderPosition = transform.localPosition;
 
-        playerController.playerUI.currentGun = currentGun;
+        if (!currentGun) playerController.playerUI.ShowAmmunitionText(false);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(shootKey)) Shoot();
+        if(currentGun)
+        {
+            if (Input.GetKeyDown(shootKey)) Shoot();
 
-        AddGunSway();
+            AddGunSway();
+        }
     }
 
     private void AddGunSway()
@@ -49,7 +54,7 @@ public class GunController : MonoBehaviour
         mouseY = Mathf.Clamp(mouseY, -maxSwayAmount, maxSwayAmount);
 
         Vector3 finalPosToMove = new Vector3(mouseX, mouseY, 0);
-        transform.localPosition = Vector3.Lerp(transform.localPosition, finalPosToMove + initialGunPosition, Time.deltaTime * smoothSwayAmount);
+        transform.localPosition = Vector3.Lerp(transform.localPosition, finalPosToMove + initialHolderPosition, Time.deltaTime * smoothSwayAmount);
     }
 
     private void Shoot()
@@ -58,7 +63,7 @@ public class GunController : MonoBehaviour
         if (Physics.Raycast(ray, out GunHit))
         {
             bullet = currentGun.Shoot(GunHit);
-            playerController.playerUI.UpdateAmmunitionText();
+            playerController.playerUI.UpdateAmmunitionText(currentGun.currentAmmunition, currentGun.maxAmmunition);
         }
     }
 
@@ -67,7 +72,7 @@ public class GunController : MonoBehaviour
         if (bullet.canReturn)
         {
             currentGun.currentAmmunition++;
-            playerController.playerUI.UpdateAmmunitionText();
+            playerController.playerUI.UpdateAmmunitionText(currentGun.currentAmmunition, currentGun.maxAmmunition);
         }
     }
 }

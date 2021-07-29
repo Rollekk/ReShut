@@ -51,22 +51,48 @@ public class BulletController : MonoBehaviour
     {
         if (!bMissed) CheckBulletFrontCollision();
         else ReturnAmmunition();
+    }
 
-        if (reboundCounter >= maxRebounds) ReturnToPlayer(gunController.currentGun.gunPoint.transform.position);
+    private void CheckBulletFrontCollision()
+    {
+        previousPosition = transform.position;
+
+        transform.position += transform.forward * bulletSpeed * Time.deltaTime;
+        if(trailRenderer.emitting) trailCollision.UpdateTrail(transform.position);
+
+        if (Physics.Raycast(previousPosition, (transform.position - previousPosition).normalized, out bulletHit, (transform.position - previousPosition).magnitude))
+        {
+            if (bulletHit.transform.tag == "Shield")
+            {
+                bMissed = true;
+                transform.gameObject.GetComponentInChildren<MeshRenderer>().enabled = false;
+            }
+            else if (bulletHit.transform.tag == "Player")
+            {
+                gunController.AddAmmunition();
+                Destroy(gameObject);
+            }
+            else if (bulletHit.transform.tag != "Target" && bulletHit.transform.tag != "Enemy")
+            {
+                if(reboundCounter >= maxRebounds) ReturnToPlayer(gunController.currentGun.gunPoint.transform.position);
+                else
+                {
+                    Rebound();
+                    trailCollision.CreateNewTrail(this);
+                }
+            }
+        }
     }
 
     public void ReturnToPlayer(Vector3 playerPosition)
     {
         gameObject.transform.rotation = gunController.currentGun.RotateToObject(playerPosition, transform.position);
-        Destroy(trailCollision.GetTrailCollider());
         trailRenderer.emitting = false;
         bulletSpeed = 25f;
     }
 
     public void Rebound()
     {
-        trailCollision.AddTrailToBullet(this);
-
         if(reboundCounter == 0) transform.forward = Vector3.Reflect(playerCamera.transform.forward, bulletHit.normal);
         else transform.forward = Vector3.Reflect(transform.forward, bulletHit.normal);
 
@@ -75,9 +101,7 @@ public class BulletController : MonoBehaviour
         reboundCounter++;
         trailRenderer.emitting = true;
 
-        ParticleSystem ps = Instantiate(reboundParticles, bulletHit.point, Quaternion.LookRotation(bulletHit.normal));
-        ps.GetComponent<ParticleSystemRenderer>().material.SetColor("_EmissionColor", trailColor);
-        ps.Play();
+        CreateReboundParticle();
     }
 
     public void ReturnAmmunition()
@@ -92,32 +116,11 @@ public class BulletController : MonoBehaviour
         }
     }
 
-    private void CheckBulletFrontCollision()
+    private void CreateReboundParticle()
     {
-        previousPosition = transform.position;
-
-        transform.position += transform.forward * bulletSpeed * Time.deltaTime;
-        trailCollision.AddTrailToBullet(this);
-
-        if (Physics.Raycast(previousPosition, (transform.position - previousPosition).normalized, out bulletHit, (transform.position - previousPosition).magnitude))
-        {
-            if (bulletHit.transform.tag == "Shield")
-            {
-                bMissed = true;
-                Destroy(trailCollision.GetTrailCollider());
-                transform.gameObject.GetComponentInChildren<MeshRenderer>().enabled = false;
-            }
-            else if (bulletHit.transform.tag == "Player")
-            {
-                gunController.AddAmmunition();
-                Destroy(gameObject);
-            }
-            else if(bulletHit.transform.tag != "Target" && bulletHit.transform.tag != "Enemy")
-            {
-                Rebound();
-                trailCollision.CreateNewTrail(this);
-            }
-        }
+        ParticleSystem ps = Instantiate(reboundParticles, bulletHit.point, Quaternion.LookRotation(bulletHit.normal));
+        ps.GetComponent<ParticleSystemRenderer>().material.SetColor("_EmissionColor", trailColor);
+        ps.Play();
     }
 
     private void OnDestroy()
