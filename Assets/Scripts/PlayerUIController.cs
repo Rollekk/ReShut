@@ -13,7 +13,6 @@ public class PlayerUIController : MonoBehaviour
     void Start()
     {
         ammunitionTMP = transform.Find("AmmunitionTMP").GetComponentInChildren<TMP_Text>();
-        pickupTMP = transform.Find("Crosshair/PickupText").GetComponentInChildren<TMP_Text>();
     }
 
     // Update is called once per frame
@@ -30,15 +29,5 @@ public class PlayerUIController : MonoBehaviour
     public void UpdateAmmunitionText(int currentAmmunition, int maxAmmunition)
     {
         ammunitionTMP.text = currentAmmunition.ToString() + "/" + maxAmmunition.ToString();
-    }
-
-    public void ShowPickupText(bool shouldShow)
-    {
-        pickupTMP.enabled = shouldShow;
-    }
-
-    public void UpdatePickupText(KeyCode pickupKeybind, string pickupName)
-    {
-        pickupTMP.text = "[" + pickupKeybind.ToString() + "]" + " Pickup " + pickupName;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public enum GunType { Normal, Ice, Fire, Poison, Electricity };
@@ -21,20 +22,28 @@ public class Gun : PickupController
     public float bulletTrailtime = 2f;
     public GameObject bulletPrefab;
 
+    public float pickupSpeed = 0.5f;
+
     private Vector3 initialPosition;
+    private Quaternion initialRotation;
+    private bool isInteracting = false;
+    private float t;
 
     // Start is called before the first frame update
-    void Start()
+    protected override void Start()
     {
+        base.Start();
+
         gunMaterials = GetComponentInChildren<MeshRenderer>().materials;
 
         initialPosition = transform.position;
+        initialRotation = transform.rotation;
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        if (isInteracting) LerpToHand();
     }
 
     public BulletController Shoot(RaycastHit GunHit)
@@ -70,6 +79,15 @@ public class Gun : PickupController
 
     public GunType GetCurrentGunType() { return gunType; }
 
+    private void LerpToHand()
+    {
+        transform.position = Vector3.Lerp(initialPosition, gunController.transform.position, t);
+        transform.rotation = Quaternion.Lerp(initialRotation, gunController.transform.rotation, t);
+        t += pickupSpeed * Time.deltaTime;
+
+        if (transform.position == gunController.transform.position) isInteracting = false;
+    }
+
     public override void PickupInteraction(PlayerController playerController)
     {
         gunController = playerController.gunController;
@@ -79,8 +97,10 @@ public class Gun : PickupController
 
         gunController.currentGun = this;
 
-        transform.position = gunController.transform.position;
-        transform.rotation = gunController.transform.rotation;
+        isInteracting = true;
+
         transform.parent = gunController.transform;
+
+        pickupTMP.gameObject.SetActive(false);
     }
 }

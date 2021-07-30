@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PickupBuff : PickupController
+public class BuffController : PickupController
 {
+    [Header("Components")]
+    public GunType buffType;
+
     [Header("Float")]
     public float rotationSpeed;
     public float floatSpeed = 0.1f;
@@ -12,28 +15,28 @@ public class PickupBuff : PickupController
     private float t = 0.0f;
     private float maxLerp, minLerp;
 
-    [Header("Components")]
-    public GunType buffType;
-
     private Material buffMaterial;
     private Color buffColor;
 
     // Start is called before the first frame update
-    void Start()
+    protected override void Start()
     {
+        base.Start();
+
+        buffMaterial = GetComponentInChildren<MeshRenderer>().material;
+        buffColor = buffMaterial.GetColor("_EmissionColor");
+
         minLerp = transform.position.y;
         maxLerp = transform.position.y + floatRange;
-
-        buffMaterial = GetComponent<MeshRenderer>().material;
-        buffColor = buffMaterial.GetColor("_EmissionColor");
     }
 
     // Update is called once per frame
     void Update()
     {
         transform.Rotate(0, rotationSpeed, 0, Space.World);
-        
+
         transform.position = new Vector3(transform.position.x, Mathf.Lerp(minLerp, maxLerp, t), transform.position.z);
+        pickupTMP.transform.position = transform.position + new Vector3(0f, initialTextHeight, 0f);
         t += floatSpeed * Time.deltaTime;
 
         if (t > 1.0f)
@@ -52,6 +55,6 @@ public class PickupBuff : PickupController
 
     public override void PickupInteraction(PlayerController playerController)
     {
-        if(playerController.gunController.currentGun) BuffPlayerWeapon(playerController.gunController);
+        if (playerController.gunController.currentGun) BuffPlayerWeapon(playerController.gunController);
     }
 }

@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float pickupDistance;
 
     private RaycastHit cursorHit;
+    private PickupController pb;
 
     // Start is called before the first frame update
     void Start()
@@ -38,17 +39,22 @@ public class PlayerController : MonoBehaviour
         {
             if (cursorHit.transform.tag == "Pickup")
             {
-                playerUI.ShowPickupText(true);
-                playerUI.UpdatePickupText(pickupKey, cursorHit.transform.name);
+                pb = cursorHit.transform.GetComponentInChildren<PickupController>();
+
+                pb.ShowPickupText(true);
+                pb.UpdatePickupText(pickupKey, cursorHit.transform.name);
 
                 if (Input.GetKeyDown(pickupKey))
                 {
-                    PickupController pb = cursorHit.transform.GetComponentInChildren<PickupController>();
                     pb.PickupInteraction(this);
                 }
             }
         }
-        else playerUI.ShowPickupText(false);
+        else if (pb)
+        {
+            pb.ShowPickupText(false);
+            pb = null;
+        }
     }
 }
 
