@@ -4,70 +4,44 @@ using UnityEngine;
 
 public class GunController : MonoBehaviour
 {
-    public enum GunType { Normal, Ice, Fire, Poison, Electricity };
-    private GunType gunType = GunType.Normal;
-
     [Header("Components")]
-    public GameObject gunPoint;
-
     public Camera playerCamera;
-    private Material[] gunMaterials;
-    private GameObject playerBody;
-    private PlayerUIController playerUI;
+
     private PlayerController playerController;
 
-    private RaycastHit GunHit;
-
-    [Header("Bullet")]
-    private Bullet bullet;
-
-    [Header("Shoot")]
-    public KeyCode shootKey;
-    public int currentAmmunition = 1;
-    public GameObject bulletPrefab;
-
     [Header("Sway")]
-    private Vector3 initialGunPosition;
+    private Vector3 initialHolderPosition;
     private float swayAmount = 0.1f;
     private float maxSwayAmount = 0.3f;
     private float smoothSwayAmount = 5.0f;
 
+    [Header("Gun")]
+    public Gun currentGun;
+
+    private RaycastHit GunHit;
+    private BulletController bullet;
+    [SerializeField] private KeyCode shootKey;
+
     // Start is called before the first frame update
     void Start()
     {
-        gunMaterials = GetComponentInChildren<MeshRenderer>().materials;
         playerController = transform.root.GetComponentInChildren<PlayerController>();
 
-        initialGunPosition = transform.localPosition;
-
         playerCamera = playerController.playerCamera;
-        playerBody = playerController.transform.gameObject;
-        playerUI = playerController.playerUI;
-        playerUI.UpdateAmmunitionText(currentAmmunition);
+
+        initialHolderPosition = transform.localPosition;
+
+        if (!currentGun) playerController.playerUI.ShowAmmunitionText(false);
     }
 
     // Update is called once per frame
     void Update()
     {
-        //if (Input.GetKeyDown(targetKey)) CreateTarget();
-        if (Input.GetKeyDown(shootKey)) Shoot();
-
-        AddGunSway();
-    }
-
-    void Shoot()
-    {
-        if (currentAmmunition > 0)
+        if(currentGun)
         {
-            Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-            if(Physics.Raycast(ray, out GunHit))
-            {
-                bullet = Instantiate(bulletPrefab, gunPoint.transform.position, RotateToObject(GunHit.point, gunPoint.transform.position)).GetComponentInChildren<Bullet>();
-                bullet.gunController = this;
-                currentAmmunition--;
-                playerUI.UpdateAmmunitionText(currentAmmunition);
-                bullet.canReturn = true;
-            }
+            if (Input.GetKeyDown(shootKey)) Shoot();
+
+            AddGunSway();
         }
     }
 
@@ -80,29 +54,25 @@ public class GunController : MonoBehaviour
         mouseY = Mathf.Clamp(mouseY, -maxSwayAmount, maxSwayAmount);
 
         Vector3 finalPosToMove = new Vector3(mouseX, mouseY, 0);
-        transform.localPosition = Vector3.Lerp(transform.localPosition, finalPosToMove + initialGunPosition, Time.deltaTime * smoothSwayAmount);
+        transform.localPosition = Vector3.Lerp(transform.localPosition, finalPosToMove + initialHolderPosition, Time.deltaTime * smoothSwayAmount);
+    }
+
+    private void Shoot()
+    {
+        Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+        if (Physics.Raycast(ray, out GunHit))
+        {
+            bullet = currentGun.Shoot(GunHit);
+            playerController.playerUI.UpdateAmmunitionText(currentGun.currentAmmunition, currentGun.maxAmmunition);
+        }
     }
 
     public void AddAmmunition()
     {
         if (bullet.canReturn)
         {
-            currentAmmunition++;
-            playerUI.UpdateAmmunitionText(currentAmmunition);
+            currentGun.currentAmmunition++;
+            playerController.playerUI.UpdateAmmunitionText(currentGun.currentAmmunition, currentGun.maxAmmunition);
         }
     }
-
-    public void ChangeGunType(GunType toThis, Color newColor)
-    {
-        gunType = toThis;
-        gunMaterials[1].SetColor("_EmissionColor", newColor);
-    }
-
-    public Quaternion RotateToObject(Vector3 target, Vector3 start)
-    {
-        Vector3 targetDirection = target - start;
-
-        return Quaternion.LookRotation(targetDirection);
-    }
-
 }
