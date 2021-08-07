@@ -229,6 +229,6 @@ MonoBehaviour:
   canReturn: 0
   trailCollision: {fileID: 1213170331226249830, guid: b924d733e9cce4d418d8941f91e5c787,
     type: 3}
-  trailColor: {r: 0, g: 0, b: 0, a: 0}
+  trailColor: {r: 1, g: 1, b: 1, a: 0}
   trailTime: 2
   maxRebounds: 5

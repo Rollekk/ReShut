@@ -15,6 +15,7 @@ public class ColorAbsorber : MonoBehaviour
 
     public bool isActive = false;
     private Color initialMaterialColor;
+    private Light absorberLight;
 
     // Start is called before the first frame update
     void Start()
@@ -22,6 +23,10 @@ public class ColorAbsorber : MonoBehaviour
         mesh = GetComponentInChildren<MeshRenderer>();
 
         initialMaterialColor = mesh.sharedMaterial.GetColor("_EmissionColor");
+
+        absorberLight = gameObject.GetComponent<Light>();
+
+        absorberLight.color = initialMaterialColor;
     }
 
     // Update is called once per frame
@@ -55,12 +60,14 @@ public class ColorAbsorber : MonoBehaviour
     private void ResetMaterial()
     {
         mesh.material.SetColor("_EmissionColor", initialMaterialColor);
+        absorberLight.color = initialMaterialColor;
         isActive = false;
     }
 
     private void ActivateAbsorber()
     {
         mesh.material.SetColor("_EmissionColor", bullet.trailColor);
+        absorberLight.color = bullet.trailColor;
         isActive = true;
         Invoke("ResetMaterial", bullet.trailTime + 0.1f);
     }

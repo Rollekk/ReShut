@@ -26,6 +26,8 @@ public class BuffController : PickupController
         buffMaterial = GetComponentInChildren<MeshRenderer>().material;
         buffColor = buffMaterial.GetColor("_EmissionColor");
 
+        transform.parent.GetComponentInChildren<Light>().color = buffColor;
+
         minLerp = transform.position.y;
         maxLerp = transform.position.y + floatRange;
     }
