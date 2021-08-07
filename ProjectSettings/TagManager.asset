@@ -8,10 +8,6 @@ TagManager:
   - Ground
   - Gun
   - Shield
-  - Trail
-  - Bullet
-  - Enemy
-  - Pickup
   layers:
   - Default
   - TransparentFX
@@ -25,9 +21,9 @@ TagManager:
   - Target
   - Glow
   - Bullet
-  - Enemy
-  - Shield
-  - Pickup
+  - 
+  - 
+  - 
   - 
   - 
   - 

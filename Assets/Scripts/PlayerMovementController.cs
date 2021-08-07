@@ -31,21 +31,21 @@ public class PlayerMovementController : MonoBehaviour
     RaycastHit GroundHit;
 
     [Header("Jump")]
-    [SerializeField] private KeyCode jumpKey;
+    public KeyCode jumpKey;
     public float jumpForce = 50f;
     public bool isInAir;
     public bool canDoubleJump;
     public bool canJump;
 
     [Header("Sprint")]
-    [SerializeField]  private KeyCode sprintKey;
+    public KeyCode sprintKey;
     public bool isSprinting;
     public float sprintSpeed;
     public float slowDownSpeed;
     public float maxMoveSpeed;
 
     [Header("Crouch && Slide")]
-    [SerializeField] private KeyCode crouchKey;
+    public KeyCode crouchKey;
     public bool isCrouching;
     public bool isSliding;
     public float crouchSpeed;
