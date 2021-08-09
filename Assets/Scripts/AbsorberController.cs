@@ -2,19 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ColorAbsorber : MonoBehaviour
+public class AbsorberController : Target
 {
     [Header("Components")]
     private BulletController bullet;
     private TrailCollision trail;
     private MeshRenderer mesh;
 
-    [Header("Color")]
+    [Header("Absorber")]
     public bool isSpecific = false;
     public GunType neededGunType;
-
+    
+    [Space]
     public bool isActive = false;
-    private Color initialMaterialColor;
+    [SerializeField] private Color initialMaterialColor;
     private Light absorberLight;
 
     // Start is called before the first frame update
@@ -35,25 +36,21 @@ public class ColorAbsorber : MonoBehaviour
         
     }
 
+    public override void OnImpact(BulletController bullet)
+    {
+        this.bullet = bullet;
+
+        ActivateAbsorber();
+    }
+
     private void OnTriggerEnter(Collider other)
     {
-
         if (other.tag == "Trail")
         {
             trail = other.GetComponentInChildren<TrailCollision>();
             bullet = trail.bulletToFollow;
 
-            if (isSpecific)
-            {
-                if (bullet.gunController.currentGun.GetCurrentGunType() == neededGunType)
-                {
-                    ActivateAbsorber();
-                }
-            }
-            else
-            {
-                ActivateAbsorber();
-            }
+            ActivateAbsorber();
         }
     }
 
@@ -66,9 +63,12 @@ public class ColorAbsorber : MonoBehaviour
 
     private void ActivateAbsorber()
     {
-        mesh.material.SetColor("_EmissionColor", bullet.trailColor);
-        absorberLight.color = bullet.trailColor;
-        isActive = true;
-        Invoke("ResetMaterial", bullet.trailTime + 0.1f);
+        if (!isSpecific || bullet.gunController.currentGun.GetCurrentGunType() == neededGunType)
+        {
+            mesh.material.SetColor("_EmissionColor", bullet.trailColor);
+            absorberLight.color = bullet.trailColor;
+            isActive = true;
+            Invoke("ResetMaterial", bullet.trailTime + 0.1f);
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class BuffController : PickupController
 {
@@ -21,6 +22,7 @@ public class BuffController : PickupController
     // Start is called before the first frame update
     protected override void Start()
     {
+        pickupTMP = transform.parent.GetComponentInChildren<TMP_Text>();
         base.Start();
 
         buffMaterial = GetComponentInChildren<MeshRenderer>().material;

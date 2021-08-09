@@ -32,6 +32,7 @@ public class Gun : PickupController
     // Start is called before the first frame update
     protected override void Start()
     {
+        pickupTMP = GetComponentInChildren<TMP_Text>();
         base.Start();
 
         gunMaterials = GetComponentInChildren<MeshRenderer>().materials;
@@ -48,20 +49,15 @@ public class Gun : PickupController
 
     public BulletController Shoot(RaycastHit GunHit)
     {
-        if (currentAmmunition > 0)
-        {
-            bullet = Instantiate(bulletPrefab, gunPoint.transform.position, RotateToObject(GunHit.point, gunPoint.transform.position)).GetComponentInChildren<BulletController>();
-            bullet.gunController = gunController;
-            bullet.trailColor = gunMaterials[1].GetColor("_EmissionColor");
-            bullet.trailTime = bulletTrailtime;
+        bullet = Instantiate(bulletPrefab, gunPoint.transform.position, RotateToObject(GunHit.point, gunPoint.transform.position)).GetComponentInChildren<BulletController>();
+        bullet.gunController = gunController;
+        bullet.trailColor = gunMaterials[1].GetColor("_EmissionColor");
+        bullet.trailTime = bulletTrailtime;
 
-            currentAmmunition--;
-            bullet.canReturn = true;
+        currentAmmunition--;
+        bullet.canReturn = true;
 
-            return bullet;
-        }
-
-        else return null;
+        return bullet;
     }
 
     public void ChangeGunType(GunType toThis, Color newColor)

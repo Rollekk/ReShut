@@ -39,7 +39,7 @@ public class GunController : MonoBehaviour
     {
         if(currentGun)
         {
-            if (Input.GetKeyDown(shootKey)) Shoot();
+            if (Input.GetKeyDown(shootKey) && currentGun.currentAmmunition > 0) Shoot();
 
             AddGunSway();
         }

@@ -4,7 +4,6 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Target
   - Ground
   - Gun
   - Shield
@@ -12,6 +11,8 @@ TagManager:
   - Bullet
   - Enemy
   - Pickup
+  - Bullet_Ignore
+  - Bullet_Hit
   layers:
   - Default
   - TransparentFX

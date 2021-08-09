@@ -62,17 +62,19 @@ public class BulletController : MonoBehaviour
 
         if (Physics.Raycast(previousPosition, (transform.position - previousPosition).normalized, out bulletHit, (transform.position - previousPosition).magnitude))
         {
-            if (bulletHit.transform.tag == "Shield")
+            if (bulletHit.transform.tag == "Shield" || bulletHit.transform.tag == "Bullet_Hit")
             {
                 bMissed = true;
                 transform.gameObject.GetComponentInChildren<MeshRenderer>().enabled = false;
+
+                if (bulletHit.transform.tag == "Bullet_Hit") bulletHit.transform.GetComponentInChildren<Target>().OnImpact(this);
             }
             else if (bulletHit.transform.tag == "Player")
             {
                 gunController.AddAmmunition();
                 Destroy(gameObject);
             }
-            else if (bulletHit.transform.tag != "Target" && bulletHit.transform.tag != "Enemy")
+            else if (bulletHit.transform.tag != "Bullet_Ignore")
             {
                 if(reboundCounter >= maxRebounds) ReturnToPlayer(gunController.currentGun.gunPoint.transform.position);
                 else

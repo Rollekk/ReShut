@@ -10,7 +10,6 @@ public class PickupController : MonoBehaviour
 
     protected virtual void Start()
     {
-        pickupTMP =  transform.parent.GetComponentInChildren<TMP_Text>();
         initialTextHeight = pickupTMP.transform.localPosition.y;
         pickupTMP.enabled = false;
     }
